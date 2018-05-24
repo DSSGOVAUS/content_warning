@@ -1,0 +1,7 @@
+name = Content Warning
+description = Adds a dismissable splash screen/modal (using tingle) to any page for new anon users
+package = Webform
+version = "7.x-1.0"
+core = 7.x
+configure = admin/config/user-interface/contentwarning
+files[] = contentwarning.module

@@ -1,0 +1,11 @@
+<?php
+function contentwarning_disable() {
+  variable_del('contentwarning_settings');
+}
+
+function contentwarning_enable() {
+  $contentwarning_settings = [
+    'warning_html' => 'This is the warning',
+  ];
+  variable_set('contentwarning_settings', $contentwarning_settings);
+}

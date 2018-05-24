@@ -1,0 +1,77 @@
+<?php
+/**
+* Implements hook_menu().
+*/
+function contentwarning_menu() {
+  $items = array();
+  $items['admin/config/user-interface/contentwarning'] = array(
+    'title' => 'Content warning',
+    'description' => 'Configuration for the content warning module.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('contentwarning_form'),
+    'access arguments' => array('administer blocks'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+/**
+* Form builder
+*/
+function contentwarning_form($form, &$form_state) {
+  $contentwarning_settings = variable_get('contentwarning_settings');
+
+  $form['warning_html'] = array(
+    '#type' => 'textarea',
+    '#title' => t('content warning text'),
+    '#default_value' => t($contentwarning_settings['warning_html']),
+    '#rows' => 4,
+    '#cols' => 60,
+  );
+
+  // Submit button
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save settings')
+  );
+  return $form;
+}
+
+/**
+* Save configuration settings
+*/
+function contentwarning_form_submit($form, &$form_state) {
+  $contentwarning_settings = array(
+    'warning_html' => $form_state['values']['warning_html'],
+  );
+  variable_set('contentwarning_settings', $contentwarning_settings);
+  drupal_set_message(t('The settings have been saved'));
+}
+
+/**
+ * Implements hook_page_build().
+ */
+function contentwarning_page_build(&$page) {
+  $contentwarning_settings = variable_get('contentwarning_settings');
+
+  drupal_add_js(array('contentwarning' => array('loggedIn' => user_is_logged_in(), 'content' => $contentwarning_settings['warning_html'])), array('type' => 'setting'));
+
+  // tingle
+  drupal_add_css(drupal_get_path('module', 'contentwarning') . '/tingle/tingle.min.css',
+    array('group' => CSS_THEME, 'type' => 'file', 'every_page' => TRUE, 'preprocess' => TRUE));
+  drupal_add_js(drupal_get_path('module', 'contentwarning') . '/tingle/tingle.min.js',
+    array('group' => JS_DEFAULT, 'type' => 'file', 'every_page' => TRUE, 'preprocess' => TRUE));
+
+  // contentwarning specific
+  drupal_add_css(drupal_get_path('module', 'contentwarning') . '/contentwarning.css',
+    array('group' => CSS_THEME, 'type' => 'file', 'preprocess' => TRUE));
+  drupal_add_js(drupal_get_path('module', 'contentwarning') . '/contentwarning.js',
+    array('group' => JS_DEFAULT, 'type' => 'file', 'scope'=>'footer', 'preprocess' => TRUE));
+}
+
+/**
+ * Implements hook_preprocess_html().
+ */
+function contentwarning_preprocess_html(&$vars) {
+  $vars['classes_array'][] = 'contentwarning';
+}
